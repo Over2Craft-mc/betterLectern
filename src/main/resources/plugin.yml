@@ -1,0 +1,5 @@
+name: BetterLectern
+version: ${project.version}
+main: over2craft.betterlectern.BetterLectern
+api-version: 1.16
+depend: [PlaceholderAPI]
