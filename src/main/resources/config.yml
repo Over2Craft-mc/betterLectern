@@ -1,0 +1,3 @@
+needs-sign: true
+sign-text: "BetterLectern"
+sign-text-is-case-sensitive: false

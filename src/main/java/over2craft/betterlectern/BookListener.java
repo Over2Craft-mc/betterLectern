@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class BookListener implements Listener {
@@ -18,8 +17,7 @@ public class BookListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getClickedBlock() != null && e.getClickedBlock().getState() instanceof Lectern) {
-
-                if (hasSignNear(e.getClickedBlock())) {
+                if (!BetterLectern.getInstance().getConfig().getBoolean(Config.NEEDS_SIGN) || hasSignNear(e.getClickedBlock())) {
                     Lectern lectern = (Lectern) e.getClickedBlock().getState();
 
                     if (lectern.getInventory().getItem(0) != null) {
@@ -32,39 +30,29 @@ public class BookListener implements Listener {
     }
 
     public boolean hasSignNear(Block block) {
-        if (block.getRelative(BlockFace.EAST).getState() instanceof Sign) {
-            Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
-            if (containsKey(sign)) {
-                return true;
+        for(BlockFace blockFace : new BlockFace[] {BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH}) {
+            if (block.getRelative(blockFace).getState() instanceof Sign) {
+                Sign sign = (Sign) block.getRelative(blockFace).getState();
+                if (containsKey(sign)) {
+                    return true;
+                }
             }
         }
-
-        if (block.getRelative(BlockFace.NORTH).getState() instanceof Sign) {
-            Sign sign = (Sign) block.getRelative(BlockFace.NORTH).getState();
-            if (containsKey(sign)) {
-                return true;
-            }
-        }
-
-        if (block.getRelative(BlockFace.SOUTH).getState() instanceof Sign) {
-            Sign sign = (Sign) block.getRelative(BlockFace.SOUTH).getState();
-            if (containsKey(sign)) {
-                return true;
-            }
-        }
-
-        if (block.getRelative(BlockFace.WEST).getState() instanceof Sign) {
-            Sign sign = (Sign) block.getRelative(BlockFace.WEST).getState();
-            return containsKey(sign);
-        }
-
         return false;
     }
 
     public boolean containsKey(Sign sign) {
+        String key = BetterLectern.getInstance().getConfig().getString(Config.SIGN_TEXT,"BetterLectern");
+        assert key != null;
         for (String line : sign.getLines()) {
-            if (line.contains("betterLectern")) {
-                return true;
+            if(BetterLectern.getInstance().getConfig().getBoolean(Config.SIGN_TEXT_IS_CASE_SENSITIVE,false)) {
+                if (line.contains(key)) {
+                    return true;
+                }
+            } else {
+                if(line.toLowerCase().contains(key.toLowerCase())) {
+                    return true;
+                }
             }
         }
         return false;
